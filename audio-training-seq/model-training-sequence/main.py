@@ -1,11 +1,9 @@
 
 import os
+import tarfile
 import boto3
-#import tarfile
 import asyncio
 from scramjet import streams
-import tarfile
-
 
 print("[INFO:] Connecting to cloud")
 
@@ -21,12 +19,13 @@ def checkpoint_search(aws_key, aws_secret, bucket):
     print(response['ResponseMetadata']['HTTPStatusCode'])
 
     bucket_lst = []
-    if 'Contents' in response:
-        print("Objects found in the bucket:")
+    try:
         for obj in response['Contents']:
             bucket_lst.append(obj['Key'])
-    else:
-        return f"No items found in bucket"
+            print(obj['Key'])
+        print("Objects found in the bucket:")
+    except KeyError:
+        print(f"No objects found in the bucket")
     print(bucket_lst) 
     return bucket_lst
 
@@ -81,27 +80,24 @@ def uncompress_tarfile(source_dir, desired_dir):
     print(f"Files extracted from tarfile completed...")
 
 
-async def run(context, input, arg1, arg2, arg3, arg4):
+async def run(context, input, key, secret, bucket, object):
 
-    key = arg1
-    secret = arg2
-    bucket = arg3
+    key = key
+    secret = secret
+    bucket = bucket
     print(f"STARTING THE SEQUENCE")
     lst = checkpoint_search(key, secret, bucket)
     
     #create directory if not existing
-    try:
-        path = "temp"
-        dir = os.makedirs(path)
-    except FileExistsError:
-        pass
+    path = "temp"
+    os.makedirs(path, exist_ok=True)
 
-    object = arg4
+    object = object
     download_path = os.path.join(path, object) 
     download_object(key, secret, bucket, object, download_path)
 
     # Unzip tarfile
-    file_path = "/".join(["temp", arg4])
+    file_path = "/".join([path, object])
     source_dir = file_path
     desired_dir = "temp_unzip"
     uncompress_tarfile(source_dir, desired_dir)

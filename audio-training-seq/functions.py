@@ -2,15 +2,11 @@ import os
 import tarfile
 import boto3
 
-
-
-
 key = ' '
 secret = ' '
 bucket = ' '
 local_path = ' '
 object_key = ' ' # checkpoint.tar.gz
-
 
 # list all object in S3
 def checkpoint_search(aws_key, aws_secret, bucket):
@@ -65,7 +61,6 @@ def upload_s3_object(aws_key, aws_secret, bucket, object_key, path_to_object):
     except Exception as e:
         print(f"Error: {e}")
 
-
 # zip checkpoint directory in a tar.gz file
 def zip_tar(target_dir, zip_name, desired_dir):
     arcname = f"{desired_dir}/{zip_name}.tar.gz"
@@ -74,7 +69,6 @@ def zip_tar(target_dir, zip_name, desired_dir):
             file = os.path.join(target_dir, file)
             tar.add(os.path.dirname(file), arcname=arcname)
 
-
 # unzip tar file
 def unzip_tar(file_path, folder_name, desired_dir):
     # unzip the tar file
@@ -82,3 +76,19 @@ def unzip_tar(file_path, folder_name, desired_dir):
     file.extractall(f"{desired_dir}/{folder_name}")
     file.close()
 
+# delete S3 object
+def delete_s3_object(aws_key, aws_secret, bucket, object_key):
+    session = boto3.session.Session()
+    s3_client = session.client(
+        service_name='s3',
+        aws_access_key_id=aws_key,
+        aws_secret_access_key=aws_secret,
+        )
+    try:
+        response = s3_client.delete_object(Bucket=bucket, Key=object_key)
+        if response['ResponseMetadata']['HTTPStatusCode'] == 204:
+            print(f"Object {object_key} was not found")
+        else:
+            print(f"Object {object_key} deleted from S3 bucket {bucket}")
+    except Exception as e:
+        print(f"Error: {e}")
