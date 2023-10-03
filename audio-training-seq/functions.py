@@ -58,20 +58,22 @@ def upload_s3_object(aws_key, aws_secret, bucket, object_key, path_to_object):
     except Exception as e:
         print(f"Error: {e}")
 
-# zip checkpoint directory in a tar.gz file
-def zip_tar(target_dir, zip_name, desired_dir):
-    arcname = f"{desired_dir}/{zip_name}.tar.gz"
-    with tarfile.open(arcname, "w:gz") as tar: # will automatically close tar archive
-        for file in os.listdir(target_dir):
-            file = os.path.join(target_dir, file)
-            tar.add(os.path.dirname(file), arcname=arcname)
+# compress file into tar.gz
+def make_tarfile(source_dir, tarfile_dir):
+    with tarfile.open(tarfile_dir, "w:gz") as tar: # with will automatically close tar archive
+        listdir = os.listdir(source_dir)
+        for file in os.listdir(source_dir):
+            file_path = os.path.join(source_dir, file)
+            arcname = file
+            tar.add(file_path, arcname=arcname) 
+    print(f"Tar file created...")
 
-# unzip tar file
-def unzip_tar(file_path, folder_name, desired_dir):
-    # unzip the tar file
-    file = tarfile.open(file_path)
-    file.extractall(f"{desired_dir}/{folder_name}")
-    file.close()
+# uncompress tar.gz file
+def uncompress_tarfile(source_dir, desired_dir):
+    os.makedirs(desired_dir, exist_ok=True)
+    with tarfile.open(source_dir, "r") as tar:
+        tar.extractall(desired_dir)
+    print(f"Files extracted from tarfile completed...")
 
 # delete S3 object
 def delete_s3_object(aws_key, aws_secret, bucket, object_key):
