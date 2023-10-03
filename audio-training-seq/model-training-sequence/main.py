@@ -36,6 +36,14 @@ def create_model(input_shape, norm_layer):
     ])
     return model
 
+# Save checkpoint
+def save_checkpoint(model, checkpoint_dir):
+    os.makedirs(checkpoint_dir, exist_ok=True)
+    checkpoint = tf.train.Checkpoint(model=model)
+    checkpoint_manager = tf.train.CheckpointManager(checkpoint, checkpoint_dir, max_to_keep=3)
+    checkpoint_manager.save()
+    print(f"New checkpoint has been saved at {checkpoint_dir}")
+
 # Load checkpoint if available
 def load_checkpoint(model, checkpoint_dir):
     checkpoint = tf.train.Checkpoint(model=model)
@@ -222,15 +230,19 @@ async def run(context, input, key, secret, bucket, object):
 
     history = model.fit(train, validation_steps=8, epochs=20, validation_data=test)
 
+    # save checkpoint after training
+    checkpoint_dir = "checkpoints"
+    save_checkpoint(model, checkpoint_dir)
+
     # Zip the checkpoint folder
-    source_dir = "temp_unzip"
+    source_dir = "checkpoints"
     tarfile_dir = "temp/checkpoint.tar.gz"
     make_tarfile(source_dir, tarfile_dir)
 
     # Upload the new checkpoint tarfile
-    up_path = "temp/checkpoint.tar.gz"
+    path = "temp/checkpoint.tar.gz"
     upload_name = "checkpoint.tar.gz"
-    upload_object(key, secret, bucket, up_path, upload_name)
+    upload_object(key, secret, bucket, path, upload_name)
 
     # list the new objects found on S3
     bucket_objects = checkpoint_search(key, secret, bucket)
