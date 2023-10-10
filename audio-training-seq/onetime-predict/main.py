@@ -20,7 +20,7 @@ def load_wav_16k_mono(file_contents): #filename):
     wav = tfio.audio.resample(wav, rate_in=sample_rate, rate_out=16000)
     return wav
 
-def preprocess(file_path): 
+def get_audio_spectrogram(file_path): 
     # Load files into 16kHz mono
     wav = load_wav_16k_mono(file_path)
     # Only read the first 3 secs
@@ -39,7 +39,7 @@ def preprocess(file_path):
 async def run(context, input):
 
     audio_file = await input.reduce(lambda a, b: a+b)
-    audio = preprocess(audio_file)
+    audio = get_audio_spectrogram(audio_file)
     # Adding batch dimension using np.newaxis
     audio = audio[np.newaxis, ...]
 
@@ -47,14 +47,14 @@ async def run(context, input):
     prediction = model(audio)
     print(f"Probability according to labels: {tf.nn.softmax(prediction[0])}")
     # change according to labeled dataset
-    x_labels = ['right', 'left', 'no', 'stop', 'down', 'go', 'up', 'yes', 'on', 'off']
+    labels = ['right', 'left', 'no', 'stop', 'down', 'go', 'up', 'yes', 'on', 'off']
 
     # Find the class index with the highest probability
     probabilities = tf.nn.softmax(prediction[0])
     predicted_class_index = tf.argmax(probabilities).numpy()
 
     # Get the corresponding label
-    predicted_label = x_labels[predicted_class_index]
+    predicted_label = labels[predicted_class_index]
     print(f"Predicted label: {predicted_label}")
 
     return streams.Stream.read_from(f"Predicted label: {predicted_label}\n")

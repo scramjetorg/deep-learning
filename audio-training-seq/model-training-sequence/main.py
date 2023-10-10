@@ -63,7 +63,7 @@ def load_wav_16k_mono(filename):
     # Goes from 44100Hz to 16000hz - amplitude of the audio signal
     wav = tfio.audio.resample(wav, rate_in=sample_rate, rate_out=16000)
 
-def preprocess(file_path): 
+def get_audio_spectrogram(file_path): 
     # Load files into 16kHz mono
     wav = load_wav_16k_mono(file_path)
     # Only read the first 3 secs
@@ -94,7 +94,7 @@ def get_record(path):
         for file in os.listdir(path_folder):
             dir_index = path_dataset.index(folder)
             audio_dir = os.path.join(path_folder, file)
-            spectrogram = preprocess(audio_dir) 
+            spectrogram = get_audio_spectrogram(audio_dir) 
             yield spectrogram, dir_index
 
 def checkpoint_search(aws_key, aws_secret, bucket):
