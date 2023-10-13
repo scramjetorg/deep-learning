@@ -91,3 +91,13 @@ def delete_s3_object(aws_key, aws_secret, bucket, object_key):
             print(f"Object {object_key} deleted from S3 bucket {bucket}")
     except Exception as e:
         print(f"Error: {e}")
+
+
+# return audio file size
+# header = 44
+# audio_bytes =  await input.read(header)
+def get_audio_size(audio_bytes: bytes, start_index: int, end_index: int) -> int: 
+        arr_bytes = audio_bytes[start_index:end_index]
+        integer = int.from_bytes(arr_bytes, byteorder='little', signed=False)
+        print(f"data size in bytes: {integer}\n")
+        return integer
