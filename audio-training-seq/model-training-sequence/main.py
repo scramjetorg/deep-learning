@@ -11,7 +11,7 @@ import tarfile
 import time
 from io import BytesIO
 import base64
-
+import numpy as np
 
 import tensorflow as tf
 import tensorflow_io as tfio
@@ -22,6 +22,13 @@ from tensorflow.keras.layers import Conv2D, Dense, Flatten, MaxPooling2D
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.optimizers import Adam
 
+
+
+#checkpoint_path = "/home/rnawfal/audio_model_01/speech-to-intent/model_checkpoint" #"model_checkpoints/cp.ckpt"
+#checkpoint_dir = os.path.dirname(checkpoint_path)
+# Restore the checkpointed model
+#checkpoint = tf.train.Checkpoint(model=model)
+#checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
 def create_model(input_shape, norm_layer):
     model = models.Sequential([
@@ -108,7 +115,6 @@ def get_record(audio_binary_files):
 #    audio_lst = split_audio(audio_binary_file)
     print(f"Length of Audio list: {len(audio_binary_files)}")
     for i in audio_binary_files:
-        print(f"SHAPE: {i.shape()}")
 #        label_num = 0
 #        label_index = labels.index(label_num)
 #        label_num += 1
@@ -143,7 +149,7 @@ def process_chunk(chunk):
     buffer.seek(0, 2)
     buffer.write(chunk)
     a = ""
-    print(f"Total buffer size {buffer.tell()} bytes")
+#    print(f"Total buffer size {buffer.tell()} bytes")
     # buffer read pointer position
     pointer = buffer.tell()
     if pointer >= MIN_SIZE:
@@ -153,7 +159,7 @@ def process_chunk(chunk):
         buffer.seek(0, 0)
         sound_data = buffer.read()
         #return ""
-    print(f'Sample length: {len(sound_data)}')
+#    print(f'Sample length: {len(sound_data)}')
     header = BytesIO(base64.b64decode(wav_header))
     # write data on header end
     header.seek(0, 2)
@@ -165,7 +171,7 @@ def process_chunk(chunk):
     # rewind and read from start (header + sound_data)
     header.seek(0, 0)
     data = header.read()
-    print(f"data length {len(data)}")
+#    print(f"data length {len(data)}")
     wav, sample_rate = tf.audio.decode_wav(data, desired_channels=1)
     # Removes trailing axis
     wav = tf.squeeze(wav, axis=-1)
@@ -261,9 +267,6 @@ def uncompress_tarfile(source_dir, desired_dir):
     print(f"Files extracted from tarfile completed...")
 
 
-#checkpoint_search(key, secret, bucket)
-
-
 async def run(context, input):
     key = ''
     secret = ''
@@ -297,11 +300,27 @@ async def run(context, input):
     # Dataset generator
 #    dataset_path = "/home/rnawfal/data/mini_speech_commands"
     many_audio = split_audio(audio_file)
-    audio_lst = []
+    print(f"length after split {len(many_audio)}")
+    
 
-    for i in many_audio:
+    fix_length = 16000  # Set a maximum length for the audio samples
+    processed_audio = []
+
+    for audio_sample in many_audio:
+        print(f"audio sample len {len(audio_sample)}")
+    # Pad or truncate audio sample to match the maximum length
+        if fix_length > len(audio_sample):
+            padded_sample = np.pad(audio_sample, (0, fix_length - len(audio_sample)))
+            processed_audio.append(padded_sample) #[:fix_length])
+        if fix_length < len(audio_sample):
+    #        padded_sample = np.pad(audio_sample, (0, fix_length - len(audio_sample)))
+            processed_audio.append(audio_sample[:fix_length])
+
+    audio_lst = []
+    for i in processed_audio: # many_audio:
         audio = process_chunk(i)
         audio_lst.append(audio)
+
     dataset_path = audio_lst
     dataset = tf.data.Dataset.from_generator(
         get_record,
@@ -362,4 +381,4 @@ async def run(context, input):
 #path_audio = "/home/rnawfal/test-audio/multi-label-audio-02.wav"
 #asyncio.run(run(None, path_audio))
 
-# si inst input - deep-learning/audio-training-seq/onetime-predict/multi-label-audio-02.wav -e -t application/octet-stream
+# si inst input - /home/rnawfal/test-audio/multi-label-audio-02.wav -e -t application/octet-stream
