@@ -331,12 +331,12 @@ async def run(context, input):
 
     # Buffer the dataset
     dataset = dataset.cache()
-    dataset = dataset.shuffle(buffer_size=10) #12600)
-    dataset = dataset.batch(10) #32)
+    dataset = dataset.shuffle(buffer_size=10) 
+    dataset = dataset.batch(8) 
     dataset = dataset.prefetch(tf.data.AUTOTUNE) #8
 
-    train = dataset.take(1) #160)
-    test = dataset.take(1) # dataset.skip(160).take(30)
+    train = dataset.take(10) 
+    test = dataset.repeat()
 
     print(f"Loading checkpoint to the Model...")
     # Model checkpoint load
