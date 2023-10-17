@@ -39,10 +39,10 @@ On the Linux terminal excute the following commands:
 ~$ si sequence send MK_2.1.tar.gz --progress
 
 # Start the Sequence with arguments
-~$ si seq start - --args=[\"aws_key, aws_secret, aws_bucket\"]
+~$ si seq start - --args=[\"aws_key\","\aws_secret\","\aws_bucket\"] # No spacing between args
 
 # Send the audio file as input
-~$ si instance input <Instance-id> <local/path/to/multi-label-audio-02.wav> -e -t application/octet-stream
+~$ si instance input <Instance-id> local/path/to/multi-label-audio-02.wav -e -t application/octet-stream
 
 # Return list of S3 Bucket objects as output
 ~$ si instance output <Instance-id>
