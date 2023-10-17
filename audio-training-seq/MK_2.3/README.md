@@ -35,7 +35,7 @@ On the Linux terminal excute the following commands:
 # Pack the MK_2.3 folder into a gzip format
 ~$ si sequence pack MK_2.3
 
-# Send the onetime-predict.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
+# Send the MK_2.3.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
 ~$ si sequence send MK_2.3.tar.gz --progress
 
 # Start the Sequence
@@ -44,7 +44,7 @@ On the Linux terminal excute the following commands:
 # Send the audio file as input
 ~$ si instance input <Instance-id> <local/path/to/audio.wav> -e -t application/octet-stream
 
-# Return classfication label as output
+# Return classfication label of audio .wav file as output
 ~$ si instance output <Instance-id>
 ```
 
