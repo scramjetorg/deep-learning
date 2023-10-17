@@ -38,7 +38,7 @@ On the Linux terminal excute the following commands:
 # Send the onetime-predict.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
 ~$ si sequence send MK_2.1.tar.gz --progress
 
-# Start the Sequence
+# Start the Sequence with arguments
 ~$ si seq start - --args=[\"aws_key, aws_secret, aws_bucket\"]
 
 # Send the audio file as input
