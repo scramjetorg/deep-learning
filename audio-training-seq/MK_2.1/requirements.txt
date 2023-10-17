@@ -2,6 +2,6 @@ pyee
 scramjet-framework-py
 boto3
 typing-extensions>=4.3.0
-tensorflow
-tensorflow_io
+tensorflow==2.13.0 
+tensorflow-io==0.33.0 
 keras

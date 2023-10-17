@@ -180,6 +180,7 @@ async def run(context, input):
 
     for i in many_audio:
         processing_result = process_chunk(i)
+        predictions.append(processing_result)
 
     print("Sequence completed ...")
     print(f"Predicted label: {predictions}\n")
