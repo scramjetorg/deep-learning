@@ -2,3 +2,6 @@ pyee
 scramjet-framework-py
 boto3
 typing-extensions>=4.3.0
+tensorflow
+tensorflow_io
+keras

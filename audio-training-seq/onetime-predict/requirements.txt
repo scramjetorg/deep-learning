@@ -1,0 +1,5 @@
+pyee
+tensorflow == 2.13.0
+tensorflow_io
+numpy
+scramjet-framework-py
