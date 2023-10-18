@@ -23,7 +23,7 @@ Install the <a href="https://docs.scramjet.org/platform/self-hosted-installation
 For more information on the below commands check the 
 <a href="https://docs.scramjet.org/platform/cli-reference/#useful-commands" target="_blank">CLI reference</a> section on Scramjet's Website.
 
-On the Linux terminal excute the following commands:
+On the Linux terminal execute the following commands:
 
 ```bash
 # Create a directory __pypackages__ in the same directory as main.py
@@ -32,7 +32,7 @@ On the Linux terminal excute the following commands:
 # Install dependencies in the __pypackages__ folder. 
 ~/onetime-predict$ pip3 install -t __pypackages__ -r requirements.txt
 
-# Pack the ontime-predict folder into a gzip format
+# Pack the onetime-predict folder into a gzip format
 ~$ si sequence pack onetime-predict
 
 # Send the onetime-predict.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
@@ -44,7 +44,7 @@ On the Linux terminal excute the following commands:
 # Send the audio file as input
 ~$ si instance input <Instance-id> <local/path/to/audio.wav> -e -t application/octet-stream
 
-# Return classfication as output
+# Return Classification as output
 ~$ si instance output <Instance-id>
 ```
 

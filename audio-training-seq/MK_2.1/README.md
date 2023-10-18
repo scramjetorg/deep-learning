@@ -1,6 +1,6 @@
 # Deep Learning - Sequential Model Sequence
 
-This repository demonstrates how to leverage deep learning techniques to recognize audio commands. 
+This directory demonstrates how to leverage deep learning techniques to recognize audio commands. 
 
 
 ## Requirements
@@ -23,7 +23,7 @@ Install the <a href="https://docs.scramjet.org/platform/self-hosted-installation
 For more information on the below commands check the 
 <a href="https://docs.scramjet.org/platform/cli-reference/#useful-commands" target="_blank">CLI reference</a> section on Scramjet's Website.
 
-On the Linux terminal excute the following commands:
+On the Linux terminal execute the following commands:
 
 ```bash
 # Create a directory __pypackages__ in the same directory as main.py
@@ -32,17 +32,17 @@ On the Linux terminal excute the following commands:
 # Install dependencies in the __pypackages__ folder. 
 ~/MK_2.1$ pip3 install -t __pypackages__ -r requirements.txt
 
-# Pack the ontime-predict folder into a gzip format
+# Pack the MK_2.1 folder into a gzip format
 ~$ si sequence pack MK_2.1
 
-# Send the onetime-predict.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
+# Send the MK_2.1.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
 ~$ si sequence send MK_2.1.tar.gz --progress
 
 # Start the Sequence with arguments
 ~$ si seq start - --args=[\"aws_key\","\aws_secret\","\aws_bucket\"] # No spacing between args
 
 # Send the audio file as input
-~$ si instance input <Instance-id> local/path/to/multi-label-audio-02.wav -e -t application/octet-stream
+~$ si instance input <Instance-id> local/path/to/multi-label-audio.wav -e -t application/octet-stream
 
 # Return list of S3 Bucket objects as output
 ~$ si instance output <Instance-id>
