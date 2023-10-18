@@ -1,6 +1,6 @@
 # Deep Learning - Inference Sequence
 
-This repository demonstrates how to leverage deep learning techniques to recognize audio commands. 
+This directory demonstrates how to leverage deep learning techniques to recognize audio commands. 
 
 
 ## Requirements
@@ -23,7 +23,7 @@ Install the <a href="https://docs.scramjet.org/platform/self-hosted-installation
 For more information on the below commands check the 
 <a href="https://docs.scramjet.org/platform/cli-reference/#useful-commands" target="_blank">CLI reference</a> section on Scramjet's Website.
 
-On the Linux terminal excute the following commands:
+On the Linux terminal execute the following commands:
 
 ```bash
 # Create a directory __pypackages__ in the same directory as main.py
@@ -42,9 +42,9 @@ On the Linux terminal excute the following commands:
 ~$ si sequence start <Sequence-id> 
 
 # Send the audio file as input
-~$ si instance input <Instance-id> <local/path/to/audio.wav -e -t application/octet-stream
+~$ si instance input <Instance-id> local/path/to/audio.wav -e -t application/octet-stream
 
-# Return classfication label of audio .wav file as output
+# Return classification label of audio .wav file as output
 ~$ si instance output <Instance-id>
 ```
 
