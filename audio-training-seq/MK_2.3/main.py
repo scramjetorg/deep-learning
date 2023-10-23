@@ -172,6 +172,7 @@ def split_non_silent_audio(audio_data, sample_width=2, silence_threshold=0.001, 
 async def run(context, input):
 
     predictions = []
+    bulb_command = []
     chunk_size = 1024 * 32
     audio_file = await input.reduce(lambda a, b: a+b)
 
@@ -183,7 +184,17 @@ async def run(context, input):
         predictions.append(processing_result)
 
     print("Sequence completed ...")
-    print(f"Predicted label: {predictions}\n")
+    print(f"Predicted labels: {predictions}\n")
 
-    return streams.Stream.read_from(f"{predictions}\n")
+    for predict in predictions:
+        if predict == "on" or predict == "off":
+            bulb_command.append(predict)
+        else:
+            pass 
+    print(f"The light will be switched {bulb_command[0]}")
+
+
+    return streams.Stream.read_from(f"{bulb_command[0]}\n")
+
+
 
