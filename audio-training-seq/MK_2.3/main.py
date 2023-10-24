@@ -4,6 +4,7 @@ import numpy as np
 import pickle
 import tensorflow as tf
 import tensorflow_io as tfio
+import noisereduce as nr
 from scramjet import streams
 from io import BytesIO
 from scipy.io import wavfile
@@ -171,7 +172,7 @@ def split_non_silent_audio(audio_data, sample_width=2, silence_threshold=0.001, 
     return non_silent_chunks
 
 
-async def _process_audio(input, output):
+async def _process_audio(input, output, noise_rate, noise_data):
 
     raw_audio_data = bytearray()
     audio_data_expected_length = 0
@@ -217,7 +218,12 @@ async def _process_audio(input, output):
 
             audio_data = pickle.loads(raw_audio_data)
 
-            wavfile.write('/tmp/dump.wav', rate=16000, data=audio_data)
+            wavfile.write('/tmp/dump_original.wav', rate=16000, data=audio_data)
+            
+            if noise_rate is not None and noise_data is not None:
+                reduced_noise = nr.reduce_noise(y=audio_data, sr=16000, y_noise=noise_data, time_constant_s= 1)
+                audio_data = reduced_noise
+                wavfile.write('/tmp/dump_denoised.wav', rate=16000, data=audio_data)
 
             predictions = []
             many_audio = split_non_silent_audio(audio_data)
@@ -250,9 +256,15 @@ def fake_input():
 async def run(context, input):
     output = streams.Stream()
 
-    asyncio.create_task(_process_audio(fake_input() if FAKE_INPUT else input, output))
+    try:
+        noise_rate, noise_data = wavfile.read('/tmp/noise.wav')
+    except Exception:
+        return output
+    
+    asyncio.create_task(_process_audio(fake_input() if FAKE_INPUT else input, output, noise_rate, noise_data))
 
     return output
+
 
 async def run_without_sth():
     async for chunk in await run(context=None, input=None):
