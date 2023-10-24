@@ -7,7 +7,6 @@ import tensorflow_io as tfio
 from scramjet import streams
 from io import BytesIO
 from scipy.io import wavfile
-import debugpy
 
 FAKE_INPUT = True
 
@@ -58,8 +57,8 @@ def analyse(buffer):
     max_probability = { "value": 0, "label": "" }
     label_names = ['right', 'left', 'no', 'stop', 'down', 'go', 'up', 'yes', 'on', 'off']
 
-    if detect_silence(buffer):
-        return ""
+    # if detect_silence(buffer):
+    #     return ""
 
     spectrogram = get_spectrogram_from_buffer(buffer)
     spectrogram = spectrogram[np.newaxis, ...]
@@ -171,14 +170,15 @@ def split_non_silent_audio(audio_data, sample_width=2, silence_threshold=0.001, 
 
     return non_silent_chunks
 
+
 async def _process_audio(input, output):
-    
+
     raw_audio_data = bytearray()
     audio_data_expected_length = 0
-    audio_data_received = 0 
+    audio_data_received = 0
     audio_receiving = False
     while True:
-        
+
         try:
             chunk = await asyncio.wait_for(input.read(),2)
 
@@ -192,16 +192,16 @@ async def _process_audio(input, output):
         if chunk == '1337' and len(raw_audio_data) == 0:
             audio_receiving = True
             continue
-        
+
         if audio_receiving:
-            
+
             if audio_data_expected_length == 0:
                 audio_data_expected_length = int(chunk)
                 print(f'Expected audio length: {audio_data_expected_length}')
                 continue
 
             if audio_data_received < audio_data_expected_length:
-                
+
                 if audio_data_received + len(chunk) <= audio_data_expected_length:
                     audio_data_received += len(chunk)
                     raw_audio_data.extend(chunk)
@@ -209,18 +209,16 @@ async def _process_audio(input, output):
                     size = audio_data_received + len(chunk) - audio_data_expected_length
                     audio_data_received += size
                     raw_audio_data.extend(chunk[0:size])
-            
+
             if audio_data_received >= audio_data_expected_length:
                 audio_receiving = False
 
         if len(raw_audio_data) > 0 and audio_receiving is False:
-            
+
             audio_data = pickle.loads(raw_audio_data)
 
-            wavfile.write('/mnt/c/Users/RadosławGierwiało/Desktop/test.wav', 
-                          rate=16000, 
-                          data=audio_data)
-            
+            wavfile.write('/tmp/dump.wav', rate=16000, data=audio_data)
+
             predictions = []
             many_audio = split_non_silent_audio(audio_data)
             print(f"number of audio files {len(many_audio)}")
@@ -232,14 +230,13 @@ async def _process_audio(input, output):
             print("Sequence completed ...")
             print(f"Predicted label: {predictions}\n")
             [output.write(label) for label in predictions]
-            #debugpy.breakpoint()
             raw_audio_data = bytearray()
             audio_data_expected_length = 0
-            audio_data_received = 0 
+            audio_data_received = 0
 
 
 def fake_input():
-    files_to_send = ['/tmp/on2.wav']
+    files_to_send = ['/tmp/on1.wav', '/tmp/off1.wav']
     stream = streams.Stream()
 
     for file in files_to_send:
@@ -251,10 +248,15 @@ def fake_input():
     return stream
 
 async def run(context, input):
-    debugpy.breakpoint()
-
     output = streams.Stream()
 
     asyncio.create_task(_process_audio(fake_input() if FAKE_INPUT else input, output))
 
     return output
+
+async def run_without_sth():
+    async for chunk in await run(context=None, input=None):
+        print(chunk)
+
+if __name__ == "__main__":
+    asyncio.run(run_without_sth())
