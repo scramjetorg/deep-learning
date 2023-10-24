@@ -182,8 +182,12 @@ async def run(context, input):
         processing_result = process_chunk(i)
         predictions.append(processing_result)
 
+    # remove empty elements from the list
+    predictions = [predict for predict in predictions if predict.strip() != '']
     print("Sequence completed ...")
-    print(f"Predicted label: {predictions}\n")
+    print(f"Predicted labels: {predictions}\n")
 
     return streams.Stream.read_from(f"{predictions}\n")
+
+
 
