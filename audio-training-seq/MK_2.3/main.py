@@ -1,12 +1,15 @@
-
+import asyncio
+import base64
+import numpy as np
+import pickle
 import tensorflow as tf
 import tensorflow_io as tfio
-import numpy as np
 from scramjet import streams
-import asyncio
 from io import BytesIO
-import base64
+from scipy.io import wavfile
+import debugpy
 
+FAKE_INPUT = True
 
 def load_wav_16k_mono(file_contents): #filename):
     # Load encoded wav file
@@ -168,22 +171,90 @@ def split_non_silent_audio(audio_data, sample_width=2, silence_threshold=0.001, 
 
     return non_silent_chunks
 
+async def _process_audio(input, output):
+    
+    raw_audio_data = bytearray()
+    audio_data_expected_length = 0
+    audio_data_received = 0 
+    audio_receiving = False
+    while True:
+        
+        try:
+            chunk = await asyncio.wait_for(input.read(),2)
+
+        except asyncio.TimeoutError:
+            await asyncio.sleep(0)
+            continue
+
+        if not chunk:
+            break
+
+        if chunk == '1337' and len(raw_audio_data) == 0:
+            audio_receiving = True
+            continue
+        
+        if audio_receiving:
+            
+            if audio_data_expected_length == 0:
+                audio_data_expected_length = int(chunk)
+                print(f'Expected audio length: {audio_data_expected_length}')
+                continue
+
+            if audio_data_received < audio_data_expected_length:
+                
+                if audio_data_received + len(chunk) <= audio_data_expected_length:
+                    audio_data_received += len(chunk)
+                    raw_audio_data.extend(chunk)
+                else:
+                    size = audio_data_received + len(chunk) - audio_data_expected_length
+                    audio_data_received += size
+                    raw_audio_data.extend(chunk[0:size])
+            
+            if audio_data_received >= audio_data_expected_length:
+                audio_receiving = False
+
+        if len(raw_audio_data) > 0 and audio_receiving is False:
+            
+            audio_data = pickle.loads(raw_audio_data)
+
+            wavfile.write('/mnt/c/Users/RadosławGierwiało/Desktop/test.wav', 
+                          rate=16000, 
+                          data=audio_data)
+            
+            predictions = []
+            many_audio = split_non_silent_audio(audio_data)
+            print(f"number of audio files {len(many_audio)}")
+
+            for i in many_audio:
+                processing_result = process_chunk(i)
+                predictions.append(processing_result)
+
+            print("Sequence completed ...")
+            print(f"Predicted label: {predictions}\n")
+            [output.write(label) for label in predictions]
+            #debugpy.breakpoint()
+            raw_audio_data = bytearray()
+            audio_data_expected_length = 0
+            audio_data_received = 0 
+
+
+def fake_input():
+    files_to_send = ['/tmp/on2.wav']
+    stream = streams.Stream()
+
+    for file in files_to_send:
+        _, data = wavfile.read(file)
+        stream.write('1337')
+        serialized = pickle.dumps(data)
+        stream.write(len(serialized))
+        stream.write(serialized)
+    return stream
 
 async def run(context, input):
+    debugpy.breakpoint()
 
-    predictions = []
-    chunk_size = 1024 * 32
-    audio_file = await input.reduce(lambda a, b: a+b)
+    output = streams.Stream()
 
-    many_audio = split_non_silent_audio(audio_file)
-    print(f"number of audio files {len(many_audio)}")
+    asyncio.create_task(_process_audio(fake_input() if FAKE_INPUT else input, output))
 
-    for i in many_audio:
-        processing_result = process_chunk(i)
-        predictions.append(processing_result)
-
-    print("Sequence completed ...")
-    print(f"Predicted label: {predictions}\n")
-
-    return streams.Stream.read_from(f"{predictions}\n")
-
+    return output
