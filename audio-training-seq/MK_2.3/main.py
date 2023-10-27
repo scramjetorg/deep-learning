@@ -8,6 +8,12 @@ import noisereduce as nr
 from scramjet import streams
 from io import BytesIO
 from scipy.io import wavfile
+import json
+
+#import debugpy
+#debugpy.listen(5678)
+#debugpy.wait_for_client()
+#debugpy.breakpoint()
 
 FAKE_INPUT = False
 
@@ -174,7 +180,7 @@ def split_non_silent_audio(audio_data, sample_width=2, silence_threshold=0.001, 
 
 async def _process_audio(input, output, noise_rate, noise_data):
 
-    raw_audio_data = bytearray()
+    raw_audio_data = []
     audio_data_expected_length = 0
     audio_data_received = 0
     audio_receiving = False
@@ -190,6 +196,7 @@ async def _process_audio(input, output, noise_rate, noise_data):
         if not chunk:
             break
 
+        chunk = json.loads(chunk[0:-1])['cmd']
         if chunk == '1337' and len(raw_audio_data) == 0:
             audio_receiving = True
             continue
@@ -216,12 +223,10 @@ async def _process_audio(input, output, noise_rate, noise_data):
 
         if len(raw_audio_data) > 0 and audio_receiving is False:
 
-            audio_data = pickle.loads(raw_audio_data)
-
-            wavfile.write('/tmp/dump_original.wav', rate=16000, data=audio_data)
+            wavfile.write('/tmp/dump_original.wav', rate=16000, data=np.array(raw_audio_data,dtype=np.int16))
             
             if noise_rate is not None and noise_data is not None:
-                reduced_noise = nr.reduce_noise(y=audio_data, sr=16000, y_noise=noise_data, time_constant_s= 1)
+                reduced_noise = nr.reduce_noise(y=np.array(raw_audio_data, dtype=np.int16), sr=16000, y_noise=noise_data, time_constant_s= 1)
                 audio_data = reduced_noise
                 wavfile.write('/tmp/dump_denoised.wav', rate=16000, data=audio_data)
 
@@ -235,8 +240,8 @@ async def _process_audio(input, output, noise_rate, noise_data):
 
             print("Sequence completed ...")
             print(f"Predicted label: {predictions}\n")
-            [output.write(label) for label in predictions]
-            raw_audio_data = bytearray()
+            [output.write(label + '\n') for label in predictions]
+            raw_audio_data = []
             audio_data_expected_length = 0
             audio_data_received = 0
 
