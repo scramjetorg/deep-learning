@@ -9,7 +9,7 @@ from scramjet import streams
 from io import BytesIO
 from scipy.io import wavfile
 
-FAKE_INPUT = True
+FAKE_INPUT = False
 
 def load_wav_16k_mono(file_contents): #filename):
     # Load encoded wav file
@@ -267,7 +267,7 @@ async def run(context, input):
 
 
 async def run_without_sth():
-    async for chunk in await run(context=None, input=None):
+    async for chunk in await run(context=None, input=streams.Stream()):
         print(chunk)
 
 if __name__ == "__main__":
