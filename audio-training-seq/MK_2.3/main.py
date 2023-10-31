@@ -9,11 +9,17 @@ from scramjet import streams
 from io import BytesIO
 from scipy.io import wavfile
 import json
+import string
+import random 
 
-#import debugpy
-#debugpy.listen(5678)
-#debugpy.wait_for_client()
-#debugpy.breakpoint()
+
+import wave
+import struct
+
+# import debugpy
+# debugpy.listen(5678)
+# debugpy.wait_for_client()
+# debugpy.breakpoint()
 
 FAKE_INPUT = False
 
@@ -64,8 +70,8 @@ def analyse(buffer):
     max_probability = { "value": 0, "label": "" }
     label_names = ['right', 'left', 'no', 'stop', 'down', 'go', 'up', 'yes', 'on', 'off']
 
-    # if detect_silence(buffer):
-    #     return ""
+    if detect_silence(buffer):
+        return ""
 
     spectrogram = get_spectrogram_from_buffer(buffer)
     spectrogram = spectrogram[np.newaxis, ...]
@@ -179,7 +185,6 @@ def split_non_silent_audio(audio_data, sample_width=2, silence_threshold=0.001, 
 
 
 async def _process_audio(input, output, noise_rate, noise_data):
-
     raw_audio_data = []
     audio_data_expected_length = 0
     audio_data_received = 0
@@ -194,8 +199,7 @@ async def _process_audio(input, output, noise_rate, noise_data):
             continue
 
         if not chunk:
-            break
-
+            continue
         chunk = json.loads(chunk[0:-1])['cmd']
         if chunk == '1337' and len(raw_audio_data) == 0:
             audio_receiving = True
@@ -223,19 +227,35 @@ async def _process_audio(input, output, noise_rate, noise_data):
 
         if len(raw_audio_data) > 0 and audio_receiving is False:
 
-            wavfile.write('/tmp/dump_original.wav', rate=16000, data=np.array(raw_audio_data,dtype=np.int16))
-            
+            name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
+        
+            wavWrite = wave.open(f'/tmp/dump_{name}_original.wav', "wb")
+            wavWrite.setnchannels(1)
+            wavWrite.setsampwidth(2)
+            wavWrite.setframerate(16000)
+            wavWrite.setcomptype('NONE', 'not compressed')
+
+            for frame in raw_audio_data:
+                wavWrite.writeframes(struct.pack("!h", frame))
+            wavWrite.close()
+
+            print (f'File saved: /tmp/dump_{name}_original.wav')
+             
             if noise_rate is not None and noise_data is not None:
-                reduced_noise = nr.reduce_noise(y=np.array(raw_audio_data, dtype=np.int16), sr=16000, y_noise=noise_data, time_constant_s= 1)
+
+                _, data = wavfile.read(f'/tmp/dump_{name}_original.wav')
+                reduced_noise = nr.reduce_noise(y=data, sr=noise_rate, time_constant_s= 1)
+
                 audio_data = reduced_noise
-                wavfile.write('/tmp/dump_denoised.wav', rate=16000, data=audio_data)
+                wavfile.write(f'/tmp/dump_{name}_denoised.wav', rate=16000, data=audio_data)
 
             predictions = []
+            
             many_audio = split_non_silent_audio(audio_data)
             print(f"number of audio files {len(many_audio)}")
 
             for i in many_audio:
-                processing_result = process_chunk(i)
+                processing_result = process_chunk(audio_data)
                 predictions.append(processing_result)
 
             print("Sequence completed ...")
