@@ -9,9 +9,6 @@ from scramjet import streams
 from io import BytesIO
 from scipy.io import wavfile
 import json
-import string
-import random 
-
 
 import wave
 import struct
@@ -185,6 +182,7 @@ def split_non_silent_audio(audio_data, sample_width=2, silence_threshold=0.001, 
 
 
 async def _process_audio(input, output, noise_rate, noise_data):
+
     raw_audio_data = []
     audio_data_expected_length = 0
     audio_data_received = 0
@@ -199,7 +197,8 @@ async def _process_audio(input, output, noise_rate, noise_data):
             continue
 
         if not chunk:
-            continue
+            break
+
         chunk = json.loads(chunk[0:-1])['cmd']
         if chunk == '1337' and len(raw_audio_data) == 0:
             audio_receiving = True
@@ -227,9 +226,7 @@ async def _process_audio(input, output, noise_rate, noise_data):
 
         if len(raw_audio_data) > 0 and audio_receiving is False:
 
-            name = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
-        
-            wavWrite = wave.open(f'/tmp/dump_{name}_original.wav', "wb")
+            wavWrite = wave.open('/tmp/dump_original.wav', "wb")
             wavWrite.setnchannels(1)
             wavWrite.setsampwidth(2)
             wavWrite.setframerate(16000)
@@ -238,19 +235,16 @@ async def _process_audio(input, output, noise_rate, noise_data):
             for frame in raw_audio_data:
                 wavWrite.writeframes(struct.pack("!h", frame))
             wavWrite.close()
-
-            print (f'File saved: /tmp/dump_{name}_original.wav')
              
             if noise_rate is not None and noise_data is not None:
 
-                _, data = wavfile.read(f'/tmp/dump_{name}_original.wav')
+                _, data = wavfile.read('/tmp/dump_original.wav')
                 reduced_noise = nr.reduce_noise(y=data, sr=noise_rate, time_constant_s= 1)
 
                 audio_data = reduced_noise
-                wavfile.write(f'/tmp/dump_{name}_denoised.wav', rate=16000, data=audio_data)
+                #wavfile.write(f'/tmp/dump_denoised.wav', rate=16000, data=audio_data)
 
             predictions = []
-            
             many_audio = split_non_silent_audio(audio_data)
             print(f"number of audio files {len(many_audio)}")
 
