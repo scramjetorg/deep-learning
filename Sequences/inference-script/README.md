@@ -1,4 +1,4 @@
-# Deep Learning - Sequential Model Sequence
+# Deep Learning - Inference Sequence
 
 This directory demonstrates how to leverage deep learning techniques to recognize audio commands. 
 
@@ -27,24 +27,24 @@ On the Linux terminal execute the following commands:
 
 ```bash
 # Create a directory __pypackages__ in the same directory as main.py
-~/MK_2.1$ mkdir __pypackages__
+~/inference-script$ mkdir __pypackages__
 
 # Install dependencies in the __pypackages__ folder. 
-~/MK_2.1$ pip3 install -t __pypackages__ -r requirements.txt
+~/inference-script$ pip3 install -t __pypackages__ -r requirements.txt
 
-# Pack the MK_2.1 folder into a gzip format
-~$ si sequence pack MK_2.1
+# Pack the inference-script folder into a gzip format
+~$ si sequence pack inference-script
 
-# Send the MK_2.1.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
-~$ si sequence send MK_2.1.tar.gz --progress
+# Send the inference-script.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
+~$ si sequence send inference-script.tar.gz --progress
 
-# Start the Sequence with arguments
-~$ si seq start - --args=[\"aws_key\","\aws_secret\","\aws_bucket\"] # No spacing between args
+# Start the Sequence
+~$ si sequence start <Sequence-id> 
 
 # Send the audio file as input
-~$ si instance input <Instance-id> local/path/to/multi-label-audio.wav -e -t application/octet-stream
+~$ si instance input <Instance-id> local/path/to/audio.wav -e -t application/octet-stream
 
-# Return list of S3 Bucket objects as output
+# Return classification label of audio .wav file as output
 ~$ si instance output <Instance-id>
 ```
 
