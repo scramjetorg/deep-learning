@@ -1,19 +1,19 @@
 {
-    "name": "Inference-Sequence",
+    "name": "training_model",
     "version": "0.1.0",
-    "main": "main.py",
+    "main": "./main.py",
     "author": "Patryk_&_Ray",
     "license": "GPL-3.0",
-    "description": "Inference prediction of an audio .wav file as input to the Sequence",
+    "description": "Retrain a Sequential model for checkpoints",
     "keywords": [
-      "Keras",
-      "machine learning",
-      "inference",
+      "advanced",
+      "message queue",
+      "Big Data/AI",
       "Data Producer"
     ],
     "repository": {
       "type": "git",
-      "url": "https://github.com/"
+      "url": "https://github.com/scramjetorg/deep-learning"
     },
     "engines": {
       "python3": "3.8.10"
@@ -22,7 +22,7 @@
       "intents.json"
     ],  
       "scripts": {
-      "build": "mkdir -p dist/__pypackages__/ && cp *.py model-prediction.keras package.json dist/ && pip3 install -t dist/__pypackages__/ -r requirements.txt",
+      "build": "mkdir -p dist/__pypackages__/ && cp *.py multi-label-audio-02.wav package.json dist/ && pip3 install -t dist/__pypackages__/ -r requirements.txt",
       "clean": "rm -rf ./dist ./*.tar.gz",
       "pack": "si seq pack ./dist/"
     },
