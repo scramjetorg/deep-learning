@@ -18,7 +18,4 @@ https://convertio.co/opus-wav/
 - Efficient Data Handling: Handle large audio datasets effectively using generators, ensuring efficient memory usage and seamless training.
 
 
-## License
-
-This project is licensed under MIT licenses. 
 
