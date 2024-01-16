@@ -27,16 +27,16 @@ On the Linux terminal execute the following commands:
 
 ```bash
 # Create a directory __pypackages__ in the same directory as main.py
-~/MK_2.3$ mkdir __pypackages__
+~/inference-script$ mkdir __pypackages__
 
 # Install dependencies in the __pypackages__ folder. 
-~/MK_2.3$ pip3 install -t __pypackages__ -r requirements.txt
+~/inference-script$ pip3 install -t __pypackages__ -r requirements.txt
 
-# Pack the MK_2.3 folder into a gzip format
-~$ si sequence pack MK_2.3
+# Pack the inference-script folder into a gzip format
+~$ si sequence pack inference-script
 
-# Send the MK_2.3.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
-~$ si sequence send MK_2.3.tar.gz --progress
+# Send the inference-script.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
+~$ si sequence send inference-script.tar.gz --progress
 
 # Start the Sequence
 ~$ si sequence start <Sequence-id> 
@@ -66,7 +66,3 @@ Sampling rate : 16.0 kHz<br/>
 Bit depth : 16 bits<br/>
 
 
-
-## License
-
-This project is licensed under MIT licenses. 

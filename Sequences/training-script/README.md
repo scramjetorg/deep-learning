@@ -27,16 +27,16 @@ On the Linux terminal execute the following commands:
 
 ```bash
 # Create a directory __pypackages__ in the same directory as main.py
-~/MK_2.1$ mkdir __pypackages__
+~/training-script$ mkdir __pypackages__
 
 # Install dependencies in the __pypackages__ folder. 
-~/MK_2.1$ pip3 install -t __pypackages__ -r requirements.txt
+~/training-script$ pip3 install -t __pypackages__ -r requirements.txt
 
-# Pack the MK_2.1 folder into a gzip format
-~$ si sequence pack MK_2.1
+# Pack the training-script folder into a gzip format
+~$ si sequence pack training-script
 
-# Send the MK_2.1.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
-~$ si sequence send MK_2.1.tar.gz --progress
+# Send the training-script.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
+~$ si sequence send training-script.tar.gz --progress
 
 # Start the Sequence with arguments
 ~$ si seq start - --args=[\"aws_key\","\aws_secret\","\aws_bucket\"] # No spacing between args
@@ -66,7 +66,3 @@ Sampling rate : 16.0 kHz<br/>
 Bit depth : 16 bits<br/>
 
 
-
-## License
-
-This project is licensed under MIT licenses. 
