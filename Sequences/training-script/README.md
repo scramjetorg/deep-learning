@@ -66,7 +66,3 @@ Sampling rate : 16.0 kHz<br/>
 Bit depth : 16 bits<br/>
 
 
-
-## License
-
-This project is licensed under MIT licenses. 
