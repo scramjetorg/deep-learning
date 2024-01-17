@@ -19,7 +19,7 @@ Install the Scramjet Transform Hub (STH) locally or use Scramjet's Cloud Platfor
 <a href="https://docs.scramjet.org/platform/cli-reference/" target="_blank">CLI reference</a> section on Scramjet's Website.
 
 
-## MK_2.1 Sequential model Sequence<br/>
+## Sequential model Sequence<br/>
 This directory demonstrates how to leverage deep learning techniques to recognize audio commands using Tensorflow and Scramjet's STH framework.
 
 **Dataset Core words:** 'down', 'go', 'left', 'no', 'off', 'on', 'right', 'stop', 'up', 'yes'
@@ -46,16 +46,16 @@ $ sudo rm -r ~/.scramjet_sequences
 
 ```bash
 # Create a directory __pypackages__ in the same directory as main.py
-~/MK_2.1$ mkdir __pypackages__
+~/Training-script$ mkdir __pypackages__
 
 # Install dependencies in the __pypackages__ folder. 
-~/MK_2.1$ pip3 install -t __pypackages__ -r requirements.txt
+~/Training-script$ pip3 install -t __pypackages__ -r requirements.txt
 
-# Pack the MK_2.1 folder into a gzip format
-~$ si sequence pack MK_2.1
+# Pack the Training-script folder into a gzip format
+~$ si sequence pack Training-script
 
-# Send the MK_2.1.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
-~$ si sequence send MK_2.1.tar.gz --progress
+# Send the Training-script.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
+~$ si sequence send Training-script.tar.gz --progress
 
 # Start the Sequence with arguments
 ~$ si seq start - --args=[\"aws_key\","\aws_secret\","\aws_bucket\"] # Without spacing between args
@@ -67,7 +67,7 @@ $ sudo rm -r ~/.scramjet_sequences
 ~$ si instance output <Instance-id>
 ```
 
-## MK_2.3 Inference Sequence
+## Inference Sequence
 
 This directory contains the code and a pre-trained keras model necessary for running an inference with the ability to send an audio file as `input`.
 
@@ -87,16 +87,16 @@ $ sudo rm -r ~/.scramjet_sequences
 
 ```bash
 # Create a directory __pypackages__ in the same directory as main.py
-~/MK_2.3$ mkdir __pypackages__
+~/Inference-script$ mkdir __pypackages__
 
 # Install dependencies in the __pypackages__ folder. 
-~/MK_2.3$ pip3 install -t __pypackages__ -r requirements.txt
+~/Inference-script$ pip3 install -t __pypackages__ -r requirements.txt
 
-# Pack the MK_2.3 folder into a gzip format
-~$ si sequence pack MK_2.3
+# Pack the Inference-script folder into a gzip format
+~$ si sequence pack Inference-script
 
-# Send the MK_2.3.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
-~$ si sequence send MK_2.3.tar.gz --progress
+# Send the Inference-script.tar.gz Sequence to the Scramjet's Transform-Hub, with a return <Sequence-id> value
+~$ si sequence send Inference-script.tar.gz --progress
 
 # Start the Sequence
 ~$ si sequence start <Sequence-id> 
@@ -110,6 +110,12 @@ $ sudo rm -r ~/.scramjet_sequences
 ## Audio format specification
 
 Audio wave file required to be sent as input must be one of ten labels:<br/> 'right', 'left', 'no', 'stop', 'down', 'go', 'up', 'yes', 'on', 'off'
+
+Dataset source<br/> 
+https://developer.ibm.com/exchanges/data/all/speech-commands/
+
+Audio conversion to PCM_S16LE Mono 16000Hz<br/>
+https://convertio.co/opus-wav/
 
 ### Audio file Details:
 
